@@ -1,0 +1,20 @@
+{
+	"manifest_version": 3,
+	"name": "Copy Video Source",
+	"version": "1.0",
+	"description": "Finds the first video on the page and copies its source URL to the clipboard.",
+	"permissions": [
+		"scripting",
+		"clipboardWrite"
+	],
+	"host_permissions": [
+		"<all_urls>"
+	],
+	"action": {
+		"default_title": "Copy Video Source",
+		"default_icon": "icon.png"
+	},
+	"background": {
+		"service_worker": "background.js"
+	}
+}
