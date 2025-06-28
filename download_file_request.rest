@@ -1,0 +1,122 @@
+### Synology Download Station - Download File from URL
+### Complete workflow for downloading a file using Synology Download Station API
+
+### Step 1: Login to Download Station
+POST http://nas.internal:5000/webapi/auth.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.API.Auth&version=2&method=login&account=tanas&passwd=Hora@9658kocek&session=DownloadStation&format=sid
+
+###
+
+### Step 2: Create Download Task (Download file from URL)
+### Replace the URL below with the actual file URL you want to download
+### The response from Step 1 will contain a 'sid' value that you need to include in the request below
+POST http://nas.internal:5000/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=1&method=create&uri=https://example.com/path/to/your/file.zip&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Step 3: Alternative - Create Download Task with destination folder
+### You can specify a destination folder (shared folder name)
+POST http://nas.internal:5000/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=1&method=create&uri=https://example.com/path/to/your/file.zip&destination=Downloads&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Step 4: List Download Tasks (to verify your download was created)
+GET http://nas.internal:5000/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Step 5: Get Detailed Task Information (optional)
+### Replace TASK_ID with the actual task ID returned from the create or list method
+GET http://nas.internal:5000/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=getinfo&id=TASK_ID&additional=detail,transfer&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Step 6: Logout (when finished)
+GET http://nas.internal:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=DownloadStation&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Additional Examples:
+
+### Download multiple files at once (comma-separated URLs)
+POST http://nas.internal:5000/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=1&method=create&uri=https://example.com/file1.zip,https://example.com/file2.pdf&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Download with authentication (for protected URLs)
+POST http://nas.internal:5000/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=1&method=create&uri=https://protected.example.com/file.zip&username=user&password=pass&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### Download torrent/magnet links
+POST http://nas.internal:5000/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=1&method=create&uri=magnet:?xt=urn:btih:HASH&_sid=YOUR_SESSION_ID_HERE
+
+###
+
+### TROUBLESHOOTING - Error Codes
+
+### Error 103: "The requested method does not exist"
+### This happens when you use an incorrect method name in the API request.
+### 
+### For SYNO.API.Auth, only these methods are supported:
+### - login
+### - logout
+###
+### Common mistakes that cause error 103:
+### 1. Using "signin" instead of "login"
+### 2. Using "logoff" instead of "logout" 
+### 3. Typos in method names
+### 4. Using methods from other APIs
+###
+### Correct login request:
+POST http://nas.internal:5000/webapi/auth.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.API.Auth&version=2&method=login&account=tanas&passwd=Hora@9658kocek&session=DownloadStation&format=sid
+
+###
+
+### Other Common Auth Error Codes:
+### 400 - No such account or incorrect password
+### 401 - Account disabled
+### 402 - Permission denied (user not in administrators group for some operations)
+### 403 - 2-step verification code required
+### 404 - 2-step verification code invalid
+
+### Common Error Codes for All APIs:
+### 100 - Unknown error
+### 101 - Invalid parameter
+### 102 - The requested API does not exist
+### 103 - The requested method does not exist
+### 104 - The requested version does not support the functionality
+### 105 - The logged in session does not have permission
+### 106 - Session timeout
+### 107 - Session interrupted by duplicate login
+
+###
+
+### API Information Query (useful for debugging)
+### Use this to check what APIs and methods are available on your NAS
+GET http://nas.internal:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=ALL
+
+###
+
+### Check specific API info
+GET http://nas.internal:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.API.Auth,SYNO.DownloadStation.Task

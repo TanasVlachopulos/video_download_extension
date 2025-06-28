@@ -1,0 +1,41 @@
+# variables
+@nas_url = http://nas.internal:5000
+@username = tanas
+@password = Hora@9658kocek
+@otp_code = 682627
+@download_video_url = https://lll.justthegays.online/II/06.25/mig/136405.mp4?id=0
+
+GET http://nas.internal:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all
+
+###
+# login with OTP to disable 2FA for this device
+
+POST {{nas_url}}/webapi/entry.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.API.Auth&version=7&method=login&account={{username}}&passwd={{password}}&otp_code={{otp_code}}&enable_device_token=yes&device_name=test_rest_client
+
+###
+# login with device token
+
+# @name login_with_device_token
+POST {{nas_url}}/webapi/entry.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.API.Auth&version=7&method=login&account={{username}}&passwd={{password}}&device_name=test_rest_client&device_id=dYd6Plnac0lR14YAUgJGXIRBbX_0Po6HT2ygXaLjd9TwOI3cN6upp5CHLaNp8C2dxN1mQ8dEzXvqlQzxO90KJA
+
+###
+# create download task from URL
+
+# @name create_download_task
+POST {{nas_url}}/webapi/DownloadStation/task.cgi
+Content-Type: application/x-www-form-urlencoded
+
+api=SYNO.DownloadStation.Task&version=2&method=create&uri={{download_video_url}}&destination=home/downloads&_sid={{login_with_device_token.response.body.data.sid}}
+
+
+
+###
+# list download tasks
+
+GET {{nas_url}}/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=1&method=list&_sid={{login_with_device_token.response.body.data.sid}}
